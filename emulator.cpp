@@ -11,5 +11,8 @@ int main(){
   std::stack<short> st; // stack
   short delay_timer = 60;
   short sound_timer = 60;
+
+
+  ImGui::CreateContext();
   return 0;
 }
