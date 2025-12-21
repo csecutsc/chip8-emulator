@@ -13,6 +13,5 @@ int main(){
   short sound_timer = 60;
 
 
-  ImGui::CreateContext();
   return 0;
 }
