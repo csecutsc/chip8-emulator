@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include <stack>
@@ -6,6 +7,10 @@
 
 void clear_screen(){
 
+}
+
+int random_range(int lower, int upper){
+  return lower + ( std::rand() % ( upper - lower + 1 ) )
 }
 
 int main(int argc, char const *argv[]){
@@ -17,6 +22,8 @@ int main(int argc, char const *argv[]){
   std::stack<short> st; // stack - stack pointer is handled by this
   short delay_timer = 60;
   short sound_timer = 60;
+  std::random_device rd;
+  std::mt19937 gen(rd())
 
 
   // open file
@@ -92,6 +99,42 @@ int main(int argc, char const *argv[]){
       else if (buffer[0] == 0x8 && buffer[3] == 6){
         registers[0xf] = (registers[buffer[1]] % 2 == 1);
         registers[buffer[1]] = registers[buffer[1]] >> 2;
+      }
+      else if (buffer[0] == 0x8 && buffer[3] == 7){
+        bool greater = (registers[buffer[2]] > registers[buffer[1]]);
+        registers[buffer[1]] = registers[buffer[1]] - registers[buffer[2]];
+        registers[buffer[2]] = greater;
+      }
+      else if (buffer[0] == 0x8 && buffer[3] == 0xe){
+        registers[buffer[1]] = registers[buffer[1]] << 1;
+        registers[0xf] = (buffer[1] >= 128)
+      }
+      else if (buffer[0] == 0x9 && buffer[3] == 0x0){
+        pc += 2*(registers[buffer[1]] != registers[buffer[2]]);
+      }
+      pc++;
+      else if (buffer[0] == 0xa){
+        ic = 256 * buffer[1] + 16 * buffer[2] + buffer[3];
+      }
+      else if (buffer[0] == 0xb){
+        pc = 256 * buffer[1] + 16 * buffer[2] + buffer[3] + registers[0];
+      }
+      else if (buffer[0] == 0xd){
+        int x_cord = buffer[1];
+        int y_cord = buffer[2];
+        int buffersize = buffer[3];
+        for (int i = 0; i < buffersize; i++){
+          if (x_cord >= 64){
+            x_cord = 0;
+            y_cord++;
+          }
+          if (display[y_cord][x_cord] != 0) registers[0xf] = 1;
+          display[y_cord][x_cord] = memory[ic + i];
+          x_cord++;
+        }
+      }
+      else if (buffer[0] == 0xe && buffer[2] == 0x9 && buffer[3] == 0xe){
+        // check keyboard
       }
       pc++;
     }
