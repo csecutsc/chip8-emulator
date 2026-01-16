@@ -1,7 +1,7 @@
 CXX = g++
 INCLUDES_DIR = include
 CXXFLAGS = -g -Wall -Wextra -std=c++20 -I$(INCLUDES_DIR) `pkg-config --cflags sdl3`
-LDFLAGS = `pkg-config --libs sdl3`
+LDFLAGS = `pkg-config --libs sdl3 curses`
 
 SOURCES = emulator.cpp \
           include/imgui.cpp \
